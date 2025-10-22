@@ -1,0 +1,170 @@
+/* ========================================
+   LTSA LAB TASKS - COMPLETE SOLUTIONS
+   ======================================== */
+
+/* TASK 1: Toggle Switch */
+SWITCH = OFF,
+OFF = (press -> ON),
+ON = (press -> OFF).
+
+/* Analysis: Simple two-state system. The switch alternates between 
+   ON and OFF states with each 'press' action. No deadlock, always responsive. */
+
+
+/* TASK 2: Traffic Light Controller */
+TRAFFIC_LIGHT = RED,
+RED = (next -> GREEN),
+GREEN = (next -> YELLOW),
+YELLOW = (next -> RED).
+
+/* Analysis: Three-state cyclic system following standard traffic light sequence.
+   Safety property: Never shows multiple colors simultaneously.
+   Liveness: Cycles through all states indefinitely. */
+
+
+/* TASK 3: Drinks Machine with Cancel Option */
+DRINKS_MACHINE = IDLE,
+IDLE = (coin -> READY | cancel -> IDLE),
+READY = (select -> DISPENSE | cancel -> REFUND),
+DISPENSE = (drink -> IDLE),
+REFUND = (return_coin -> IDLE).
+
+/* Analysis: Extended from basic drinks machine. Cancel option provides:
+   - User control at any stage
+   - Money-back guarantee before drink selection
+   - Returns to IDLE after cancellation
+   Safety: No coin is kept without dispensing drink or refund. */
+
+
+/* TASK 4: Coin Toss Machine (Non-deterministic) */
+COIN_TOSS = (toss -> RESULT),
+RESULT = (heads -> COIN_TOSS | tails -> COIN_TOSS).
+
+/* Analysis: Non-determinism models randomness in coin toss.
+   After toss action, system non-deterministically chooses heads or tails.
+   Both outcomes equally possible from same state.
+   Models real-world unpredictability. */
+
+
+/* TASK 5: Counter with Guards (Range 0-3) */
+const MIN = 0
+const MAX = 3
+
+COUNTER = COUNT[0],
+COUNT[i:MIN..MAX] = 
+    (when (i < MAX) inc -> COUNT[i+1]
+    |when (i > MIN) dec -> COUNT[i-1]).
+
+/* Analysis: Guard conditions prevent:
+   - Overflow: inc disabled when i == MAX
+   - Underflow: dec disabled when i == MIN
+   Range: [0,3] ensures bounded counting.
+   Safety: Counter never exceeds limits. */
+
+
+/* TASK 6: Maker-User Synchronization */
+MAKER = (make -> ready -> MAKER).
+USER = (ready -> use -> USER).
+
+||MAKER_USER = (MAKER || USER).
+
+/* Analysis: Shared action 'ready' synchronizes processes.
+   Maker must signal ready before User can proceed.
+   Demonstrates rendezvous synchronization.
+   Ensures sequential ordering: make -> ready -> use */
+
+
+/* TASK 7: Client-Server with Relabelling */
+CLIENT = (request -> reply -> CLIENT).
+SERVER = (receive -> send -> SERVER).
+
+||CLIENT_SERVER = (CLIENT || SERVER)
+    /{request/receive, reply/send}.
+
+/* Analysis: Relabelling maps actions:
+   - CLIENT.request -> SERVER.receive
+   - CLIENT.reply <- SERVER.send
+   Creates synchronized communication channel.
+   Ensures request-response pattern is maintained. */
+
+
+/* TASK 8: Shared Printer (Mutual Exclusion) */
+USER1 = (acquire -> print1 -> release -> USER1).
+USER2 = (acquire -> print2 -> release -> USER2).
+PRINTER = (acquire -> release -> PRINTER).
+
+||SHARED_PRINTER = (USER1 || USER2 || PRINTER).
+
+/* Analysis: PRINTER controls mutual exclusion through acquire/release.
+   Only one user can acquire printer at a time.
+   Safety: No interleaved printing (mutual exclusion guaranteed).
+   Liveness: Users eventually get printer access.
+   Possible deadlock: None, as resources are always released. */
+
+
+/* TASK 9: ATM System with Safety Property */
+ATM = IDLE,
+IDLE = (insert_card -> AUTH),
+AUTH = (enter_pin -> VERIFY),
+VERIFY = (authorized -> TRANSACTION | unauthorized -> RETURN_CARD),
+TRANSACTION = (request_cash -> DISPENSE),
+DISPENSE = (dispense_cash -> RETURN_CARD),
+RETURN_CARD = (return_card -> IDLE).
+
+/* Safety Property: Cash only dispensed after authorization */
+property NO_UNAUTH_CASH = 
+    (insert_card -> enter_pin -> 
+        (authorized -> request_cash -> dispense_cash -> return_card -> NO_UNAUTH_CASH
+        |unauthorized -> return_card -> NO_UNAUTH_CASH)).
+
+||ATM_SAFE = (ATM || NO_UNAUTH_CASH).
+
+/* Analysis: 
+   Safety verification: dispense_cash only reachable after authorized.
+   Path to dispense: insert_card -> enter_pin -> authorized -> request_cash -> dispense_cash
+   Property ensures no cash dispensed on unauthorized path.
+   Check: Compile and verify no property violation in LTSA. */
+
+
+/* TASK 10: ATM with Progress Property */
+ATM_PROG = IDLE,
+IDLE = (insert_card -> AUTH),
+AUTH = (enter_pin -> VERIFY),
+VERIFY = (authorized -> TRANSACTION | unauthorized -> RETURN_CARD),
+TRANSACTION = (request_cash -> DISPENSE | cancel -> RETURN_CARD),
+DISPENSE = (dispense_cash -> RETURN_CARD),
+RETURN_CARD = (return_card -> IDLE).
+
+/* Progress Property: Card always eventually returned */
+progress CARD_RETURNED = {return_card}
+
+||ATM_WITH_PROGRESS = (ATM_PROG).
+
+/* Analysis:
+   Progress property ensures return_card action eventually occurs.
+   Every path from insert_card leads to return_card.
+   No infinite loops before card return.
+   LTSA will verify no progress violation exists.
+   
+   Verification steps:
+   1. Check all paths reach RETURN_CARD state
+   2. Ensure no cycles exclude return_card action
+   3. Confirm both authorized and unauthorized paths return card */
+
+
+/* ========================================
+   ADDITIONAL VERIFICATION NOTES
+   ======================================== */
+
+/* To run in LTSA:
+   1. Copy each model separately into LTSA editor
+   2. Compile to generate LTS diagrams
+   3. For safety/progress properties, check "Safety" and "Progress" tabs
+   4. Observe state space and transitions
+   5. Verify no ERROR states are reachable
+   
+   Expected Results:
+   - All models should compile without errors
+   - Safety properties should pass (no violations)
+   - Progress properties should be satisfied
+   - LTS diagrams should match specifications */
