@@ -1,3 +1,6 @@
 # Software-Quality-Assurance
 
-#[https://docs.google.com/document/d/1v5JNHMSsYOxhcRsKvyZizOW3oDxxL4BitlTb8LSSUIY/edit?tab=t.0](https://docs.google.com/document/d/1v5JNHMSsYOxhcRsKvyZizOW3oDxxL4BitlTb8LSSUIY/edit?usp=sharing)
+#[Docs](https://docs.google.com/document/d/1v5JNHMSsYOxhcRsKvyZizOW3oDxxL4BitlTb8LSSUIY/edit?usp=sharing)
+
+#[Poster](https://www.canva.com/design/DAG7Tz39gRM/RVet8EGfVdA0bP7lfuJWZQ/watch?utm_content=DAG7Tz39gRM&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h3100e0c5c3)
+
